@@ -1,5 +1,8 @@
+from src.extract.rawg import fetch_all_games
+
+
 def main():
-    print("Hello from video-games-data-pipeline!")
+    fetch_all_games()
 
 
 if __name__ == "__main__":
