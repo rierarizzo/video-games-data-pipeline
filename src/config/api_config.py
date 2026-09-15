@@ -16,6 +16,7 @@ class APIConfig:
     games_url: str = f"{base_url}/games"
     max_per_page: int = 40
     timeout_seconds: int = 30
+    ordering: str = "updated"
 
     def __post_init__(self):
         """Validate configuration after initialization."""

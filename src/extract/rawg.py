@@ -1,6 +1,8 @@
 import requests
 from src.config.api_config import APIConfig
 import logging
+from urllib3.util.retry import Retry
+from requests.adapters import HTTPAdapter
 
 logger = logging.getLogger(__name__)
 
@@ -13,6 +15,7 @@ def fetch_games(session: requests.Session, page: int = 1) -> dict:
             "key": APIConfig.api_key,
             "page": page,
             "page_size": APIConfig.max_per_page,
+            "ordering": APIConfig.ordering,
         },
         timeout=APIConfig.timeout_seconds,
     )
@@ -28,12 +31,22 @@ def fetch_game_pages():
     page = 1
 
     with requests.Session() as session:
+        retry_strategy = Retry(
+            total=5,
+            backoff_factor=2,
+            status_forcelist=[429, 500, 502, 503, 504],
+            allowed_methods=["GET"],
+        )
+
+        adapter = HTTPAdapter(max_retries=retry_strategy)
+
+        session.mount("https://", adapter)
+        session.mount("http://", adapter)
+
         while True:
             data = fetch_games(session, page)
-
-            yield data["results"]
-
             logger.info(f"Fetched page {page} with {len(data["results"])} games")
+            yield data["results"]
 
             if not data.get("next"):
                 break
