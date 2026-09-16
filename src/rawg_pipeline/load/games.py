@@ -1,7 +1,8 @@
-from sqlalchemy.engine import Engine
-from sqlalchemy import text, bindparam
-from sqlalchemy.dialects.postgresql import JSONB
 import logging
+
+from sqlalchemy import bindparam, text
+from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.engine import Engine
 
 logger = logging.getLogger(__name__)
 
@@ -9,13 +10,15 @@ logger = logging.getLogger(__name__)
 def ensure_raw_games_table(engine: Engine) -> None:
     """Create the raw_games table if it does not exist."""
     with engine.begin() as connection:
-        connection.execute(text("""
+        connection.execute(
+            text("""
                             CREATE TABLE IF NOT EXISTS raw_games (
                                 id INTEGER PRIMARY KEY,
                                 data JSONB NOT NULL,
                                 extracted_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
                             );
-                        """))
+                        """)
+        )
 
 
 def get_existing_game_ids(engine: Engine) -> set[int]:
@@ -37,7 +40,8 @@ def insert_data_in_raw_games_table(engine: Engine, data: list[dict]) -> None:
 
     if len(rows) != 0:
         logger.info(
-            f"Inserting from game #{rows[0]['id']} to game #{rows[-1]['id']} into the database"
+            f"Inserting from game #{rows[0]['id']} "
+            f"to game #{rows[-1]['id']} into the database"
         )
 
         with engine.begin() as connection:

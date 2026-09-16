@@ -1,13 +1,29 @@
 [project]
 name = "video-games-data-pipeline"
 version = "0.1.0"
-description = "Add your description here"
+description = "ELT pipeline for extracting, storing, and transforming video game data from the RAWG API."
 readme = "README.md"
 requires-python = ">=3.14"
+
 dependencies = [
-    "black[jupyter]>=26.5.1",
     "psycopg[binary]>=3.3.5",
     "python-dotenv>=1.2.3",
     "requests>=2.34.2",
     "sqlalchemy>=2.0.52",
 ]
+
+[dependency-groups]
+dev = ["ruff>=0.16.7"]
+
+[project.scripts]
+rawg-pipeline = "rawg_pipeline.main:main"
+
+[build-system]
+requires = ["uv_build>=0.12.14,<0.13"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "rawg_pipeline"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]

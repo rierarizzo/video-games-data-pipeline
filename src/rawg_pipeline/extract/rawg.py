@@ -1,8 +1,10 @@
-import requests
-from src.config.api_config import APIConfig
 import logging
-from urllib3.util.retry import Retry
+
+import requests
 from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
+
+from rawg_pipeline.config.api import APIConfig
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +47,7 @@ def fetch_game_pages():
 
         while True:
             data = fetch_games(session, page)
-            logger.info(f"Fetched page {page} with {len(data["results"])} games")
+            logger.info(f"Fetched page {page} with {len(data['results'])} games")
             yield data["results"]
 
             if not data.get("next"):

@@ -1,7 +1,11 @@
-from src.extract.rawg import fetch_game_pages
-from src.db import create_db_engine
-from src.load.database import ensure_raw_games_table, insert_data_in_raw_games_table
 import logging
+
+from rawg_pipeline.database.connection import create_db_engine
+from rawg_pipeline.extract.rawg import fetch_game_pages
+from rawg_pipeline.load.games import (
+    ensure_raw_games_table,
+    insert_data_in_raw_games_table,
+)
 
 
 def main():

@@ -6,7 +6,7 @@ The goal of this project is to build an end-to-end data pipeline that extracts v
 
 ## Objectives
 
-* Extract game and genre data from the RAWG API.
+* Extract game data from the RAWG API.
 * Store raw API responses in PostgreSQL.
 * Implement incremental data loading.
 * Transform raw data into clean and structured tables.
@@ -19,6 +19,40 @@ The goal of this project is to build an end-to-end data pipeline that extracts v
 * SQLAlchemy
 * Docker
 * RAWG API
+
+## Running the Project
+
+Install dependencies:
+
+```bash
+uv sync
+```
+
+Start the PostgreSQL services:
+
+```bash
+docker compose up -d
+```
+
+Run the pipeline:
+
+```bash
+uv run rawg-pipeline
+```
+
+## Development
+
+Lint and auto-fix:
+
+```bash
+uv run ruff check . --fix
+```
+
+Format:
+
+```bash
+uv run ruff format .
+```
 
 ## Project Status
 
