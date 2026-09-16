@@ -11,13 +11,12 @@ def ensure_raw_games_table(engine: Engine) -> None:
     """Create the raw_games table if it does not exist."""
     with engine.begin() as connection:
         connection.execute(
-            text("""
-                            CREATE TABLE IF NOT EXISTS raw_games (
-                                id INTEGER PRIMARY KEY,
-                                data JSONB NOT NULL,
-                                extracted_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-                            );
-                        """)
+            text("""CREATE TABLE IF NOT EXISTS raw_games (
+                    id INTEGER PRIMARY KEY,
+                    data JSONB NOT NULL,
+                    extracted_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+                );
+            """)
         )
 
 
