@@ -1,25 +1,33 @@
 import logging
+from datetime import datetime
 
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
-from rawg_pipeline.config.api import APIConfig
+from rawg_pipeline.config.api import API_CONFIG
 
 logger = logging.getLogger(__name__)
 
 
-def fetch_games(session: requests.Session, page: int = 1) -> dict:
+def fetch_games(
+    session: requests.Session, from_date: datetime | None, page: int = 1
+) -> dict:
     """Fetch a page of games from the RAWG API"""
+    params = {
+        "key": API_CONFIG.api_key,
+        "ordering": API_CONFIG.ordering,
+        "page_size": API_CONFIG.max_per_page,
+        "page": page,
+    }
+
+    if from_date is not None:
+        params["updated"] = f"{from_date:%Y-%m-%d},{API_CONFIG.max_date:%Y-%m-%d}"
+
     response = session.get(
-        url=APIConfig.games_url,
-        params={
-            "key": APIConfig.api_key,
-            "page": page,
-            "page_size": APIConfig.max_per_page,
-            "ordering": APIConfig.ordering,
-        },
-        timeout=APIConfig.timeout_seconds,
+        url=API_CONFIG.games_url,
+        params=params,
+        timeout=API_CONFIG.timeout_seconds,
     )
 
     response.raise_for_status()
@@ -27,7 +35,7 @@ def fetch_games(session: requests.Session, page: int = 1) -> dict:
     return response.json()
 
 
-def fetch_game_pages():
+def fetch_game_pages(from_date: datetime | None):
     """Fetch all games from all available RAWG API pages."""
     games = []
     page = 1
@@ -46,7 +54,7 @@ def fetch_game_pages():
         session.mount("http://", adapter)
 
         while True:
-            data = fetch_games(session, page)
+            data = fetch_games(session, from_date, page)
             logger.info(f"Fetched page {page} with {len(data['results'])} games")
             yield data["results"]
 

@@ -4,6 +4,8 @@ from sqlalchemy import bindparam, text
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.engine import Engine
 
+from rawg_pipeline.database.games import get_existing_game_ids
+
 logger = logging.getLogger(__name__)
 
 
@@ -18,14 +20,6 @@ def ensure_raw_games_table(engine: Engine) -> None:
                 );
             """)
         )
-
-
-def get_existing_game_ids(engine: Engine) -> set[int]:
-    """Get IDs of games already stored in the database."""
-    with engine.connect() as connection:
-        result = connection.execute(text("SELECT id FROM raw_games"))
-
-        return set(result.scalars())
 
 
 def insert_data_in_raw_games_table(engine: Engine, data: list[dict]) -> None:
@@ -45,10 +39,10 @@ def insert_data_in_raw_games_table(engine: Engine, data: list[dict]) -> None:
 
         with engine.begin() as connection:
             connection.execute(
-                text("""
-                            INSERT INTO raw_games (id, data) 
-                            VALUES (:id, :data)
-                        """).bindparams(bindparam("data", type_=JSONB)),
+                text("""INSERT INTO raw_games (id, data) 
+                        VALUES (:id, :data)""").bindparams(
+                    bindparam("data", type_=JSONB)
+                ),
                 rows,
             )
     else:

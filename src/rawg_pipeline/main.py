@@ -1,6 +1,7 @@
 import logging
 
 from rawg_pipeline.database.connection import create_db_engine
+from rawg_pipeline.database.games import get_latest_game_updated
 from rawg_pipeline.extract.rawg import fetch_game_pages
 from rawg_pipeline.load.games import (
     ensure_raw_games_table,
@@ -17,7 +18,8 @@ def main():
     engine = create_db_engine()
 
     # Extract
-    game_pages = fetch_game_pages()
+    last_updated = get_latest_game_updated(engine)
+    game_pages = fetch_game_pages(from_date=last_updated)
 
     # Load
     ensure_raw_games_table(engine)

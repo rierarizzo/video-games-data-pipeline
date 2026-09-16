@@ -1,5 +1,6 @@
 import os
 from dataclasses import dataclass
+from datetime import date
 
 from dotenv import load_dotenv
 
@@ -17,6 +18,7 @@ class APIConfig:
     max_per_page: int = 40
     timeout_seconds: int = 30
     ordering: str = "updated"
+    max_date: date = date.max
 
     def __post_init__(self):
         """Validate configuration after initialization."""
