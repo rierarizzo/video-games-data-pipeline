@@ -16,13 +16,13 @@ def main():
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     )
     engine = create_db_engine()
+    ensure_raw_games_table(engine)
 
     # Extract
     last_updated = get_latest_game_updated(engine)
     game_pages = fetch_game_pages(from_date=last_updated)
 
     # Load
-    ensure_raw_games_table(engine)
     for games in game_pages:
         insert_data_in_raw_games_table(engine, games)
 
