@@ -4,8 +4,6 @@ from sqlalchemy import bindparam, text
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.engine import Engine
 
-from rawg_pipeline.database.games import get_existing_game_ids
-
 logger = logging.getLogger(__name__)
 
 
@@ -24,26 +22,20 @@ def ensure_raw_games_table(engine: Engine) -> None:
 
 def insert_data_in_raw_games_table(engine: Engine, data: list[dict]) -> None:
     """Insert data in raw_games table"""
-    existing_game_ids = get_existing_game_ids(engine)
-    rows = [
-        {"id": game["id"], "data": game}
-        for game in data
-        if game["id"] not in existing_game_ids
-    ]
+    rows = [{"id": game["id"], "data": game} for game in data]
 
-    if len(rows) != 0:
-        logger.info(
-            f"Inserting from game #{rows[0]['id']} "
-            f"to game #{rows[-1]['id']} into the database"
+    logger.info(
+        "Inserting games updated from %s to %s into the database",
+        rows[0]["data"]["updated"],
+        rows[-1]["data"]["updated"],
+    )
+
+    with engine.begin() as connection:
+        connection.execute(
+            text("""INSERT INTO raw_games (id, data) 
+                    VALUES (:id, :data)
+                    ON CONFLICT (id) DO NOTHING""").bindparams(
+                bindparam("data", type_=JSONB)
+            ),
+            rows,
         )
-
-        with engine.begin() as connection:
-            connection.execute(
-                text("""INSERT INTO raw_games (id, data) 
-                        VALUES (:id, :data)""").bindparams(
-                    bindparam("data", type_=JSONB)
-                ),
-                rows,
-            )
-    else:
-        logger.info("There are no new records to insert into the database")
