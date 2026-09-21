@@ -37,14 +37,14 @@ def fetch_games(
 
 def fetch_game_pages(from_date: datetime | None):
     """Fetch all games from all available RAWG API pages."""
-    games = []
     page = 1
+    last_inserted_date: datetime | None = None
 
     with requests.Session() as session:
         retry_strategy = Retry(
             total=5,
             backoff_factor=2,
-            status_forcelist=[404, 429, 500, 502, 503, 504],
+            status_forcelist=[429, 500, 502, 503, 504],
             allowed_methods=["GET"],
         )
 
@@ -54,13 +54,20 @@ def fetch_game_pages(from_date: datetime | None):
         session.mount("http://", adapter)
 
         while True:
+            # Workaround: RAWG API consistely returns 404 when requesting page 251.
+            if page == 251:
+                page = 1
+                from_date = last_inserted_date
+
             data = fetch_games(session, from_date, page)
-            logger.info(f"Fetched page {page} with {len(data['results'])} games")
+            logger.info(
+                f"Fetched page {page} with {len(data['results'])} "
+                f"(from_date={from_date.isoformat() if from_date else None})"
+            )
             yield data["results"]
 
             if not data.get("next"):
                 break
 
+            last_inserted_date = datetime.fromisoformat(data["results"][-1]["updated"])
             page += 1
-
-    return games

@@ -25,7 +25,7 @@ def insert_data_in_raw_games_table(engine: Engine, data: list[dict]) -> None:
     rows = [{"id": game["id"], "data": game} for game in data]
 
     logger.info(
-        "Inserting games updated from %s to %s into the database",
+        "Inserting games updated from %s to %s",
         rows[0]["data"]["updated"],
         rows[-1]["data"]["updated"],
     )
