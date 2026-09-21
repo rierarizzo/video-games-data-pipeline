@@ -44,7 +44,7 @@ def fetch_game_pages(from_date: datetime | None):
         retry_strategy = Retry(
             total=5,
             backoff_factor=2,
-            status_forcelist=[429, 500, 502, 503, 504],
+            status_forcelist=[404, 429, 500, 502, 503, 504],
             allowed_methods=["GET"],
         )
 
