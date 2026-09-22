@@ -1,4 +1,5 @@
 import logging
+from pathlib import Path
 
 from sqlalchemy import bindparam, text
 from sqlalchemy.dialects.postgresql import JSONB
@@ -9,15 +10,10 @@ logger = logging.getLogger(__name__)
 
 def ensure_raw_games_table(engine: Engine) -> None:
     """Create the raw_games table if it does not exist."""
+    sql = Path("sql/001_create_raw_games.sql").read_text(encoding="utf-8")
+
     with engine.begin() as connection:
-        connection.execute(
-            text("""CREATE TABLE IF NOT EXISTS raw_games (
-                    id INTEGER PRIMARY KEY,
-                    data JSONB NOT NULL,
-                    extracted_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-                );
-            """)
-        )
+        connection.exec_driver_sql(sql)
 
 
 def insert_data_in_raw_games_table(engine: Engine, data: list[dict]) -> None:
