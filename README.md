@@ -12,6 +12,39 @@ The goal of this project is to build an end-to-end data pipeline that extracts v
 * Transform raw data into clean and structured tables.
 * Build a reproducible ETL/ELT pipeline following data engineering practices.
 
+## Analytical Questions
+
+The transformed data model is being designed to answer questions such as:
+
+* Which genre has the highest average playtime?
+* Which platform has the largest number of available games?
+* Which genre has the highest average RAWG rating?
+
+Additional analytical questions will be added as the data model evolves.
+
+## Selected Data
+
+The transformation layer currently considers the following RAWG fields:
+
+* `id`
+* `slug`
+* `name`
+* `playtime`
+* `platforms`
+* `parent_platforms`
+* `stores`
+* `released`
+* `tba`
+* `rating` → `rawg_rating`
+* `ratings`
+* `ratings_count` → `rawg_ratings_count`
+* `added`
+* `added_by_status`
+* `metacritic` → `metacritic_score`
+* `updated`
+* `esrb_rating`
+* `genres`
+
 ## Tech Stack
 
 * Python
