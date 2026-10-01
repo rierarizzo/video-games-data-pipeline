@@ -15,6 +15,9 @@ class APIConfig:
     api_key: str = os.getenv("RAWG_API_KEY", "")
     base_url: str = "https://api.rawg.io/api"
     games_url: str = f"{base_url}/games"
+    genres_url: str = f"{base_url}/genres"
+    platforms_url: str = f"{base_url}/platforms"
+    parent_platforms_url: str = f"{platforms_url}/lists/parents"
     max_per_page: int = 40
     timeout_seconds: int = 30
     ordering: str = "updated"

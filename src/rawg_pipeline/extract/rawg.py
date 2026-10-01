@@ -71,3 +71,56 @@ def fetch_game_pages(from_date: datetime | None):
 
             last_inserted_date = datetime.fromisoformat(data["results"][-1]["updated"])
             page += 1
+
+
+def fetch_genres() -> list[dict]:
+    """Fetch all genres from the RAWG API"""
+    params = {
+        "key": API_CONFIG.api_key,
+    }
+
+    response = requests.get(
+        url=API_CONFIG.genres_url, params=params, timeout=API_CONFIG.timeout_seconds
+    )
+
+    response.raise_for_status()
+    data = response.json()
+    logger.info(f"Fetched genres with {data['count']} results")
+
+    return data["results"]
+
+
+def fetch_platforms() -> list[dict]:
+    """Fetch all platforms from the RAWG API"""
+    params = {
+        "key": API_CONFIG.api_key,
+    }
+
+    response = requests.get(
+        url=API_CONFIG.platforms_url, params=params, timeout=API_CONFIG.timeout_seconds
+    )
+
+    response.raise_for_status()
+    data = response.json()
+    logger.info(f"Fetched platforms with {data['count']} results")
+
+    return data["results"]
+
+
+def fetch_parent_platforms() -> list[dict]:
+    """Fetch all parent platforms from the RAWG API"""
+    params = {
+        "key": API_CONFIG.api_key,
+    }
+
+    response = requests.get(
+        url=API_CONFIG.parent_platforms_url,
+        params=params,
+        timeout=API_CONFIG.timeout_seconds,
+    )
+
+    response.raise_for_status()
+    data = response.json()
+    logger.info(f"Fetched parent platforms with {data['count']} results")
+
+    return data["results"]
