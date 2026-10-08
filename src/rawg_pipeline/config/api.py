@@ -18,6 +18,7 @@ class APIConfig:
     genres_url: str = f"{base_url}/genres"
     platforms_url: str = f"{base_url}/platforms"
     parent_platforms_url: str = f"{platforms_url}/lists/parents"
+    stores_url: str = f"{base_url}/stores"
     max_per_page: int = 40
     timeout_seconds: int = 30
     ordering: str = "updated"

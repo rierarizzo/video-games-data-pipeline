@@ -7,6 +7,7 @@ from rawg_pipeline.extract.rawg import (
     fetch_genres,
     fetch_parent_platforms,
     fetch_platforms,
+    fetch_stores,
 )
 from rawg_pipeline.load.games import (
     ensure_raw_tables,
@@ -14,6 +15,7 @@ from rawg_pipeline.load.games import (
     insert_data_in_raw_genres_table,
     insert_data_in_raw_parent_platforms_table,
     insert_data_in_raw_platforms_table,
+    insert_data_in_raw_stores_table,
 )
 
 
@@ -32,11 +34,13 @@ def main():
     genres = fetch_genres()
     platforms = fetch_platforms()
     parent_platforms = fetch_parent_platforms()
+    stores = fetch_stores()
 
     # Load
     insert_data_in_raw_genres_table(engine, genres)
     insert_data_in_raw_platforms_table(engine, platforms)
     insert_data_in_raw_parent_platforms_table(engine, parent_platforms)
+    insert_data_in_raw_stores_table(engine, stores)
     for games in game_pages:
         insert_data_in_raw_games_table(engine, games)
 

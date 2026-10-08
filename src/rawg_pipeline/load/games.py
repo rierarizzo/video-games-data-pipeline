@@ -18,12 +18,14 @@ def ensure_raw_tables(engine: Engine) -> None:
     raw_parent_platforms_sql = Path(
         "sql/004_create_raw_parent_platforms.sql"
     ).read_text(encoding="utf-8")
+    raw_stores_sql = Path("sql/005_create_raw_stores.sql").read_text(encoding="utf-8")
 
     with engine.begin() as connection:
         connection.exec_driver_sql(raw_games_sql)
         connection.exec_driver_sql(raw_genres_sql)
         connection.exec_driver_sql(raw_platforms_sql)
         connection.exec_driver_sql(raw_parent_platforms_sql)
+        connection.exec_driver_sql(raw_stores_sql)
 
 
 def insert_data_in_raw_games_table(engine: Engine, data: list[dict]) -> None:
@@ -101,6 +103,26 @@ def insert_data_in_raw_parent_platforms_table(engine: Engine, data: list[dict]) 
                     ON CONFLICT (id) DO UPDATE
                     SET data = EXCLUDED.data
                     WHERE raw_parent_platforms.data 
+                    IS DISTINCT FROM EXCLUDED.data""").bindparams(
+                bindparam("data", type_=JSONB)
+            ),
+            rows,
+        )
+
+
+def insert_data_in_raw_stores_table(engine: Engine, data: list[dict]) -> None:
+    """Insert data in raw_stores table"""
+    rows = [{"id": genre["id"], "data": genre} for genre in data]
+
+    logger.info("Inserting stores")
+
+    with engine.begin() as connection:
+        connection.execute(
+            text("""INSERT INTO raw_stores (id, data)
+                    VALUES (:id, :data)
+                    ON CONFLICT (id) DO UPDATE
+                    SET data = EXCLUDED.data
+                    WHERE raw_stores.data 
                     IS DISTINCT FROM EXCLUDED.data""").bindparams(
                 bindparam("data", type_=JSONB)
             ),
