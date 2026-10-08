@@ -32,17 +32,17 @@ The transformation layer currently considers the following RAWG fields:
 * `playtime`
 * `platforms`
 * `parent_platforms`
-* `stores` -> TODO: Otra tabla
+* `stores` -> TODO: New table
 * `released`
 * `tba` -> `to_be_announced`
 * `rating` → `rawg_rating`
-* `ratings` -> TODO: Otra tabla
+* `ratings` -> TODO: New table
 * `ratings_count` → `rawg_ratings_count`
 * `added` -> `added_to_library`
-* `added_by_status` -> TODO: Otra tabla
+* `added_by_status` -> TODO: New table
 * `metacritic` → `metacritic_score`
 * `updated`
-* `genres` -> TODO: Otra tabla
+* `genres` -> TODO: New table
 
 ## Tech Stack
 
