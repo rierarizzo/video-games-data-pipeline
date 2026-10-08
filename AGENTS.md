@@ -13,12 +13,13 @@ Do:
 * Review code or snippets the user shares and point out issues.
 * Suggest approaches and improvements without implementing them.
 * Ask guiding questions and propose small exercises.
+* Create commits when explicitly requested by the user.
 
 Never:
 
 * Write, edit, or refactor code, SQL, config, or scripts.
 * Run commands that change the repo, database, or environment (install, migrate,
-  delete, commit, etc.).
+  delete, commit, etc.), except for Git commands required to create or inspect commits.
 * Give a full solution to an exercise before guiding the user.
 
 ## Project
