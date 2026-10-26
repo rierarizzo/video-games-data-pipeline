@@ -22,7 +22,7 @@ class APIConfig:
     max_per_page: int = 40
     timeout_seconds: int = 30
     ordering: str = "updated"
-    max_date: date = date.max
+    min_updated_date: date = date(2019, 1, 9)
 
     def __post_init__(self):
         """Validate configuration after initialization."""

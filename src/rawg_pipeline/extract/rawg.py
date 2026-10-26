@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+from datetime import date
 
 import requests
 from requests.adapters import HTTPAdapter
@@ -11,9 +11,7 @@ from rawg_pipeline.config.api import API_CONFIG
 logger = logging.getLogger(__name__)
 
 
-def fetch_games(
-    session: requests.Session, from_date: datetime | None, page: int = 1
-) -> dict:
+def fetch_games(session: requests.Session, day: date | None, page: int = 1) -> dict:
     """Fetch a page of games from the RAWG API"""
     params = {
         "key": API_CONFIG.api_key,
@@ -22,8 +20,8 @@ def fetch_games(
         "page": page,
     }
 
-    if from_date is not None:
-        params["updated"] = f"{from_date:%Y-%m-%d},{API_CONFIG.max_date:%Y-%m-%d}"
+    if day is not None:
+        params["updated"] = f"{day:%Y-%m-%d},{day:%Y-%m-%d}"
 
     response = session.get(
         url=API_CONFIG.games_url,
@@ -85,29 +83,22 @@ def fetch_catalog_pages(catalog_url: str) -> list[dict]:
     return results
 
 
-def fetch_game_pages(from_date: datetime | None):
+def fetch_game_pages(day: date | None):
     """Fetch all games from all available RAWG API pages."""
     page = 1
-    last_inserted_date: datetime | None = None
 
     with create_http_session() as session:
         while True:
-            # Workaround: RAWG API consistely returns 404 when requesting page 251.
-            if page == 251:
-                page = 1
-                from_date = last_inserted_date
-
-            data = fetch_games(session, from_date, page)
+            data = fetch_games(session, day, page)
             logger.info(
                 f"Fetched page {page} with {len(data['results'])} "
-                f"(from_date={from_date.isoformat() if from_date else None})"
+                f"(day={day.isoformat() if day else None})"
             )
             yield data["results"]
 
             if not data.get("next"):
                 break
 
-            last_inserted_date = datetime.fromisoformat(data["results"][-1]["updated"])
             page += 1
 
 
