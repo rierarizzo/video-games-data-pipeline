@@ -12,7 +12,7 @@ from rawg_pipeline.extract.rawg import (
     fetch_stores,
 )
 from rawg_pipeline.load.games import (
-    ensure_tables,
+    ensure_schema,
     insert_data_in_raw_games_table,
     insert_data_in_raw_genres_table,
     insert_data_in_raw_parent_platforms_table,
@@ -27,7 +27,7 @@ def main():
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     )
     engine = create_db_engine()
-    ensure_tables(engine)
+    ensure_schema(engine)
 
     genres = fetch_genres()
     platforms = fetch_platforms()

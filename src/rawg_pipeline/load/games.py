@@ -8,33 +8,35 @@ from sqlalchemy.engine import Engine
 logger = logging.getLogger(__name__)
 
 
-def ensure_tables(engine: Engine) -> None:
-    """Create the control and raw tables if they do not exist.
+def ensure_schema(engine: Engine) -> None:
+    """Bring the database to the state the pipeline expects.
 
-    Runs the SQL scripts for ``etl_state`` and the ``raw_*`` tables. Safe to
-    call on every run: each script uses ``CREATE TABLE IF NOT EXISTS``.
+    Creates the control table ``etl_state``, the ``raw_*`` tables and the
+    ``stg_*`` views. Call it once at startup, before extracting or loading
+    anything.
 
-    All statements run inside a single transaction, so either every table is
-    created or none is.
+    Safe to call on every run: every script is idempotent, so a second call
+    leaves the database unchanged. All statements run inside a single
+    transaction, so either every object is created or none is.
+
+    Files in ``sql/`` are executed in ascending filename order, so the
+    zero-padded numeric prefix defines dependency order: a script that reads
+    from an object must have a higher prefix than the script that creates it.
+    Each file must contain exactly one statement.
+
+    Args:
+        engine: Database engine used to reach the database.
     """
-    etl_state_sql = Path("sql/000_create_etl_state.sql").read_text(encoding="utf-8")
-    raw_games_sql = Path("sql/001_create_raw_games.sql").read_text(encoding="utf-8")
-    raw_genres_sql = Path("sql/002_create_raw_genres.sql").read_text(encoding="utf-8")
-    raw_platforms_sql = Path("sql/003_create_raw_platforms.sql").read_text(
-        encoding="utf-8"
-    )
-    raw_parent_platforms_sql = Path(
-        "sql/004_create_raw_parent_platforms.sql"
-    ).read_text(encoding="utf-8")
-    raw_stores_sql = Path("sql/005_create_raw_stores.sql").read_text(encoding="utf-8")
+    sql_dir = Path("sql")
+    sql_files = sorted(sql_dir.glob("*.sql"))
+
+    if not sql_files:
+        raise RuntimeError(f"No SQL scripts found in {sql_dir.resolve()}")
 
     with engine.begin() as connection:
-        connection.exec_driver_sql(etl_state_sql)
-        connection.exec_driver_sql(raw_games_sql)
-        connection.exec_driver_sql(raw_genres_sql)
-        connection.exec_driver_sql(raw_platforms_sql)
-        connection.exec_driver_sql(raw_parent_platforms_sql)
-        connection.exec_driver_sql(raw_stores_sql)
+        for sql_file in sql_files:
+            logger.info("Executing SQL script %s", sql_file.name)
+            connection.exec_driver_sql(sql_file.read_text(encoding="utf-8"))
 
 
 def insert_data_in_raw_games_table(engine: Engine, data: list[dict]) -> None:
