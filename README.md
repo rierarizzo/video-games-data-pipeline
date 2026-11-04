@@ -22,27 +22,34 @@ The transformed data model is being designed to answer questions such as:
 
 Additional analytical questions will be added as the data model evolves.
 
-## Selected Data
+## Selected Fields
 
-The transformation layer currently considers the following RAWG fields:
+RAWG fields used by the pipeline and where each one lands.
 
-* `id`
-* `slug`
-* `name`
-* `playtime`
-* `platforms`
-* `parent_platforms`
-* `stores` -> TODO: New table
-* `released`
-* `tba` -> `to_be_announced`
-* `rating` → `rawg_rating`
-* `ratings` -> TODO: New table
-* `ratings_count` → `rawg_ratings_count`
-* `added` -> `added_to_library`
-* `added_by_status` -> TODO: New table
-* `metacritic` → `metacritic_score`
-* `updated`
-* `genres` -> TODO: New table
+| RAWG field | Target |
+| --- | --- |
+| `id`, `slug`, `name` | `stg_games` |
+| `playtime`, `released`, `tba` | `stg_games` |
+| `rating`, `ratings_count`, `metacritic` | `stg_games` |
+| `added` | `stg_games.added_to_library` |
+| `updated` | `stg_games.updated_at` |
+| `genres`, `platforms`, `parent_platforms`, `stores`, `ratings`, `added_by_status` | staging tables (pending) |
+
+## Data Model
+
+Raw payloads are stored untouched in JSONB. Staging is derived from them: a
+flattened view for the scalar fields and one table per nested collection.
+
+| Layer | Object | Source | Shape | Status |
+| --- | --- | --- | --- | --- |
+| Control | `etl_state` | pipeline | table | done |
+| Raw | `raw_games` | `/games` | JSONB | done |
+| Raw | `raw_genres` | `/genres` | JSONB | done |
+| Raw | `raw_platforms` | `/platforms` | JSONB | done |
+| Raw | `raw_parent_platforms` | `/platforms/lists/parents` | JSONB | done |
+| Raw | `raw_stores` | `/stores` | JSONB | done |
+| Staging | `stg_games` | `raw_games` | view | done |
+| Staging | bridge tables for the nested collections above | `raw_games` | tables | pending |
 
 ## Tech Stack
 
@@ -85,6 +92,10 @@ Format:
 ```bash
 uv run ruff format .
 ```
+
+## Design Decisions
+
+Non-obvious choices — JSONB raw layer vs typed columns, watermark table vs `MAX(updated)`, views vs tables — are documented with their trade-offs in [docs/decisions.md](docs/decisions.md).
 
 ## Project Status
 
